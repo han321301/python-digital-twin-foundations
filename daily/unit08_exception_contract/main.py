@@ -149,20 +149,121 @@ def add_measurement(
 
 add_measurement(
     factory,
-    "PUMP-011",
+    "PUMP-01",
     "TEMP-01",
     "32.5",
 )
 
 # ------------------------------------------------------------------
-# 5.
+# 5. except은 어디서 하는가?
 # ------------------------------------------------------------------
+# raise와 except의 구분
+# raise: 의도적으로 에러를 만들어 냄, 마찬가지로 하위코드 실행을 멈추고 에러 전파한다
+# except: 발생한 에러를 해결함, 에러를 잡아내는 역할
+
+
+# 측정값 등록과 처리 실패 매세지 출력까지 다하는 상황
+def add_measurement():
+    try:
+        ...
+    except InvalidMeasurementError:
+        print("등록 실패")
+
+# 문제는 이 함수가 나중에 API에서도 쓸 수 있다는 점
+# POST/measurements 
+# 이 상황에서 에러 메세지는 필요하지 않음, 대신 HTTP 400 응답을 보냄
+
+# 이 함수가 직접 에러에 대한 처리를 하는게 아니라, 상황을 전달만 하면 됨
+# 호출하는 쪽에서 그 오류내용을 출력할지, 로그로 남길지, API 오류 응답으로 보낼지 결정하게 둠 
+# 오류를 발견하는 코드와 대응하는 코드를 분리해야 한다는 것
+# 해당 함수가 해결할 수 있는가(범위 내인가)를 기준으로 판단 
+
+# 예시 패턴 1 - 메서드 분리 
+# 하위 메서드 - 자기 역할만하고 에러는 위로 던진다
+def read_config_file():
+    with open("config.json", "r") as f:
+        return f.read()
+
+# 상위 메서드 - 에러 핸들링
+def initialize_program():
+    try: 
+        config = read_config_file()
+    except FileNotFoundError:
+        print(f"")
 
 # ------------------------------------------------------------------
-# 6. 
+# 6. 반환값 정하기 
 # ------------------------------------------------------------------
+# return {
+#     "device_id": device_id,
+#     "sensor_id": sensor_id,
+#     "value": value,
+# }
 
-# ------------------------------------------------------------------
-# 
-# ------------------------------------------------------------------
+factory = {
+    "PUMP-01": {
+        "name": "냉각수 펌프",
+        "sensors": {
+            "TEMP-01": {
+                "type": "temperature",
+                "unit": "celsius",
+                "measurements": [],
+            }
+        },
+    }
+}
 
+# 최종 함수 
+def add_measurement(
+    factory: dict,
+    device_id: str,
+    sensor_id: str,
+    raw_value,
+) -> dict:
+
+    # 1. 장치와 센서가 유효한지 확인 
+    device = factory.get(device_id)
+
+    if device is None: 
+        raise DeviceNotFoundError(f"DeviceNotFoundError: {device_id}")
+    
+    sensor = device["sensors"].get(sensor_id)
+
+    if sensor is None:
+        raise SensorNotFoundError(f"SensorNotFoundError: {sensor_id}")
+
+    # 2. 추가하려는 값이 유효한지 확인 
+    # 실수로 변환 가능한가
+    try:
+        value = float(raw_value)
+    # 에러 전환  
+    except (ValueError, TypeError) as error:
+        raise InvalidMeasurementError(
+            f"invalid value: {raw_value}"
+        ) from error 
+
+    # 범위 내의 값인가 
+    minimum, maximun = VALID_RANGES[sensor["type"]]
+
+    if not minimum <= value <= maximun:
+        raise InvalidMeasurementError(
+            f"InvalidMeasurementError"
+        )
+
+    # 3. 데이터를 리스트에 추가
+    sensor["measurements"].append(value)
+
+    # 4. 결과 리턴 
+    return {
+        "device_id": device_id,
+        "sensor_id": sensor_id,
+        "value": value,
+    }
+
+result = add_measurement(
+    factory,
+    "PUMP-01",
+    "TEMP-01",
+    "32.5",
+)
+print(f"new measurement added: {result}")
