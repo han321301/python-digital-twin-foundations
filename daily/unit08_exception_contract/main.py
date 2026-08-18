@@ -267,3 +267,163 @@ result = add_measurement(
     "32.5",
 )
 print(f"new measurement added: {result}")
+
+# ==================================================================
+# 과제 정의 
+# ==================================================================
+records = [
+    {
+        "device_id": "PUMP-01",
+        "sensor_id": "TEMP-01",
+        "value": "32.5",
+    },
+    {
+        "device_id": "PUMP-01",
+        "sensor_id": "VIB-01",
+        "value": "4.8",
+    },
+    {
+        "device_id": "PUMP-01",
+        "sensor_id": "TEMP-99",
+        "value": "28.0",
+    },
+    {
+        "device_id": "PUMP-99",
+        "sensor_id": "TEMP-01",
+        "value": "30.1",
+    },
+    {
+        "device_id": "PUMP-01",
+        "sensor_id": "TEMP-01",
+        "value": "error",
+    },
+    {
+        "device_id": "PUMP-01",
+        "sensor_id": "TEMP-01",
+        "value": "29.3",
+    },
+]
+
+factory = {
+    "PUMP-01": {
+        "name": "냉각수 펌프",
+        "sensors": {
+            "TEMP-01": {
+                "type": "temperature",
+                "unit": "celsius",
+                "measurements": [],
+            }
+        },
+    }
+}
+
+# 초기 함수 
+def ingest_measurements(
+    factory: dict,
+    records: list[dict],
+) -> dict:
+    ...
+
+# 리턴 형식 
+{
+    "total": 6,
+    "success_count": 3,
+    "failure_count": 3,
+    "successes": [
+        {
+            "device_id": "PUMP-01",
+            "sensor_id": "TEMP-01",
+            "value": 32.5,
+            "unit": "celsius",
+        },
+        {
+            "device_id": "PUMP-01",
+            "sensor_id": "VIB-01",
+            "value": 4.8,
+            "unit": "mm/s",
+        },
+        {
+            "device_id": "PUMP-01",
+            "sensor_id": "TEMP-01",
+            "value": 29.3,
+            "unit": "celsius",
+        },
+    ],
+    "failures": [
+        {
+            "record": {
+                "device_id": "PUMP-01",
+                "sensor_id": "TEMP-99",
+                "value": "28.0",
+            },
+            "error_type": "SensorNotFoundError",
+            "message": "...",
+        },
+        ...
+    ],
+}
+
+# ------------------------------------------------------------------
+# 구현부  
+# ------------------------------------------------------------------
+# {
+#         "device_id": "PUMP-01",
+#         "sensor_id": "TEMP-01",
+#         "value": "32.5",
+#     },
+
+def ingest_measurements(
+    factory: dict,
+    records: list[dict],
+) -> dict:
+    """
+    factory 딕셔너리에서 해당 센서의 값을 추가하기 
+    과정에서 성공/실패/전체 처리를 카운팅
+    성공/실패 데이터를 리스트에 담기 
+    """
+    successes = []
+    failures = []
+
+    for record in records:
+        try:
+            # 1. record에서 필요한 필드 추출
+            device = record["device_id"]
+            sensor = record["sensor_id"]
+            value = record["value"]
+
+            # 2. add_measurement() 호출
+            result = add_measurement(factory, device, sensor, value)
+
+            # 3. 성공 결과 저장
+            successes.append(result)
+
+        except KeyError as error:
+            failures.append({
+                "record": record,
+                "error_type": "KeyError",
+                "message": (f"필수 필드가 없습니다. {error.args[0]}")
+            })
+
+        except(
+            DeviceNotFoundError,
+            SensorNotFoundError,
+            InvalidMeasurementError,
+
+        ) as error:
+            # 4. 예상 가능한 예외는 실패 목록에 저장
+            failures.append({
+                "record": record,
+                "error_type": type(error).__name__,
+                "message": str(error)
+            })
+
+    return {
+        "total": len(records),
+        "success_count": len(successes),
+        "failure_count": len(failures),
+        "successes": successes,
+        "failures": failures,
+    }
+
+result = ingest_measurements(factory, records)
+print(result["failures"])
