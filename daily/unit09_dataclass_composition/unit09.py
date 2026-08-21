@@ -4,8 +4,6 @@
 # - 단일 Sensor 클래스를 확장해서, Device가 여러 Sensor 객체를 관리하는 구조
 # - 장비에 센서를 등록하고, 센서 상태를 이용해 장비 전체 상태를 계산하는 기능
 
-
-
 # ------------------------------------------------------------------
 # 1. 표준 라이브러리 dataclasses는 언제 쓰는가
 # ------------------------------------------------------------------
@@ -71,7 +69,7 @@ class Device:
     # measurements: dict = {} 
     # 여러 인스턴스가 같은 딕셔너리르 공유할 위험이 있음
     # 가변 객체(리스트와 딕셔너리)는 파이썬에서 기본값으로 지정할 수 없음 
-    # 이렇게가 아니라  dict() 활용해서 작성
+    # 이렇게가 아니라  dict[] 활용해서 작성
     # field()는 dataclass 세밀하게 설정할 때 사용
     sensors: dict[str, Sensor] = field(
         default_factory=dict
@@ -276,9 +274,6 @@ print(device.overall_status())
 # ------------------------------------------------------------------
 # 8. 최종 코드 
 # ------------------------------------------------------------------
-from dataclasses import dataclass, field
-
-
 STATUS_PRIORITY = {
     "normal": 0,
     "warning": 1,
@@ -363,26 +358,63 @@ class Device:
 # 기존은 삭제하고 새로 등록함
 # 기존 객체를 반환함 
 # 에러 핸들링 - 기존 센서가 없다면 낫파운드, 새 센서가 이미 존재하면 얼레디
-
 # 주의: 모든 검증 통과 후에 삭제한다 
 # 기존 센서 존재 확인 -> 새 센서 중복 확인 -> 기존 센서 삭제 -> 새 센서 등록 -> 기존 센서 반환
 
+@dataclass
+class Device:
+    device_id: str
+    name: str
+    sensors: dict[str, Sensor] = field(
+        default_factory=dict
+    )
 
-# ------------------------------------------------------------------
-# 
-# ------------------------------------------------------------------
+    def replace_sensor(
+        self, old_sensor_id, new_sensor: Sensor
+    ) -> Sensor:
+        
+        # 1. 기존에 센서가 있는지 확인
+        old_sensor = self.sensors.get(old_sensor_id)
 
+        if old_sensor is None:
+            raise SensorNotFoundError(
+                f"sensor not found"
+            )
+        
+        # 2. 새 센서 중복확인 
+        if new_sensor.sensor_id in self.sensors:
+            raise SensorAlreadyExistsError(
+                f"sensor alreay exists"
+            )
 
-# ------------------------------------------------------------------
-# 
-# ------------------------------------------------------------------
+        # 기존 센서 삭제 
+        del self.sensors[old_sensor_id]
 
+        # 새 센서 등록 
+        self.sensors[new_sensor.sensor_id] = new_sensor
 
-# ------------------------------------------------------------------
-# 
-# ------------------------------------------------------------------
+        # 기존 센서 반환 
+        return old_sensor
 
+old_sensor = Sensor(
+        "TEMP-01",
+        "temperature",
+        "celsius",
+)
 
-# ------------------------------------------------------------------
-# 
-# ------------------------------------------------------------------
+device = Device(
+    "PUMP-01",
+    "냉각수 펌프",
+    {"TEMP-01": old_sensor}
+)
+
+device.replace_sensor(
+    "TEMP-01",
+    Sensor(
+        "TEMP-02",
+        "temperature",
+        "celsius",
+    ),
+)
+
+print(device.sensors)
