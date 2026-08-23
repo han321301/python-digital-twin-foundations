@@ -151,74 +151,28 @@ print(sensor.measurements)  # [] 외부에서 _measurements를 비워버림
 # 검증 로직이 필요한 것(@property 적용할 것)
 # : measurements, latest_value, measurement_count
 
-# ==================================================================
-# 구현 과제 - 설비 모니터링 요약 만들기
-# ==================================================================
-# 목표 리턴 값 형태 
-{
-    "device_id": "PUMP-01",
-    "name": "냉각수 펌프",
-    "sensor_count": 3,
-    "active_sensor_count": 2,
-    "sensors": {
-        "TEMP-01": {
-            "type": "temperature",
-            "unit": "celsius",
-            "latest_value": 30.8,
-            "measurement_count": 3,
-        },
-        "VIB-01": {
-            "type": "vibration",
-            "unit": "mm/s",
-            "latest_value": 4.1,
-            "measurement_count": 2,
-        },
-    },
-}
-
-# 시작 뼈대 
+# ------------------------------------------------------------------
+# 7. setter 로 유효성 검사 
+# ------------------------------------------------------------------
 @dataclass
-class Device:
-    device_id: str
-    name: str
+class Sensor:
+    sensor_id: str # @property로 함수 버튼으로 작동됨 
 
-    sensors: dict[str, Sensor] = field(
-        default_factory=dict
-    )
+    @property
+    def sensor_id(self): # 함수로 정의되는 sensor_id
+        return self._sensor_id
 
-    def add_sensor(self, sensor: Sensor) -> None:
-        self.sensors[sensor.sensor_id] = sensor
+    @sensor_id.setter
+    def sensor_id(self, value: str):
+        if not isinstance(value, str):
+            raise TypeError("id는 문자여야 합니다.")
+        self._sensor_id = value # id를 담는 진짜 데이터 상자 선언 
 
-    def build_device_snapshot(device: Device) -> dict:
-        sensor_data = {}
+sensor = Sensor("abc1234")
+sensor.sensor_id = "abc"
 
-        for sensor_id, sensor in device.sensors.items():
-            # 각 센서의 공개 인터페이스만 사용
-            ...
+print(f"sensor_id: {sensor.sensor_id}")
 
-        return {
-            "device_id": device.device_id,
-            "name": device.name,
-            "sensor_count": ...,
-            "active_sensor_count": ...,
-            "sensors": sensor_data,
-        }
-
-# 데이터 
-temp_sensor = Sensor(
-    "TEMP-01",
-    "temperature",
-    "celsius",
-)
-
-vibration_sensor = Sensor(
-    "VIB-01",
-    "vibration",
-    "mm/s",
-)
-
-pressure_sensor = Sensor(
-    "PRESS-01",
-    "pressure",
-    "bar",
-)
+# setter가 아래에 있어도, 실제 실행될 때는 세터가 먼저 실행됨
+# setter는 변수 선언없이 동적으로 즉시 변수를 새로 생성한다.
+# `self._sensor_id = value`를 실행하는 순간 동적으로 변수를 만듬 
