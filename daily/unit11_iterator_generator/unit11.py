@@ -23,7 +23,7 @@ class Sensor:
     def unit(self):
         return self.unit
 
-    @unit.seeter
+    @unit.setter
     def unit(self, value: str):
         if not isinstance(value, str):
             raise TypeError("")
@@ -91,7 +91,7 @@ while True:
 # Iterator를 구현해주는 기능 => yield 
 
 # ------------------------------------------------------------------
-# 3. yield로 실제 데이터 스트림 만들기 
+# 3. yield로 센서 데이터 한 건씩 제공하기 
 # ------------------------------------------------------------------
 def read_measurements(records):
     for record in records:
@@ -105,7 +105,6 @@ def read_measurements(records):
 stream = read_measurements(records) 
 
 print(f"stream: {stream}") 
-# Generator 객체만 생성된 상태
 # <generator object read_measurements at 0x102bc0d40>
 
 # 함수 내부 코드 실행 시작 
@@ -131,3 +130,16 @@ stream = read_measurements(records)
 
 print(next(stream))
 print(next(stream))
+
+# ------------------------------------------------------------------
+# 5.제너레이터 주의점
+# ------------------------------------------------------------------
+# 제너레이터는 실행 위치를 기억하고, 누를 때마다 하나씩 꺼내주는 재생버튼 같은 것
+
+# Generator: 대량 데이터를 한번만 순차 처리할 때, 스트리밍 데이터 
+# List: 결과를 여러번 사용할 예정, 인덱스로 접근해야 할 때 
+
+# 저장할 필요가 있다면 리스트로 변환할 수 있음
+measurements = list(read_measurements(records))
+
+print(f"measurements: {measurements}")
