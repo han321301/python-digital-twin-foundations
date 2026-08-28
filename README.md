@@ -1,75 +1,48 @@
-## 학습 방식
+# Python Digital Twin Learning Curriculum
 
-* 기간: 14일
-* 학습 시간: 하루 2시간
-* 중심 예제: 장비·센서 상태 관리 시스템
-* 매일 별도의 폴더에서 학습
-* 개념 학습 후 구현, 테스트, 리팩터링 진행
+## 학습 목표
 
-## 커리큘럼
+Python 핵심 개념을 하나의 장비·센서 상태 관리 예제에 계속 적용하면서 익히고, 이후 FastAPI + DB + 비동기 센서 처리까지 연결한다.
 
-### 1주 차 — 데이터와 함수 설계
+- Python의 객체·함수·자료구조 동작 원리를 이해한다.
+- 하나의 디지털트윈 예제를 확장하면서 개념을 연결한다.
+- 새 기술이나 라이브러리가 등장할 때 사용법뿐 아니라 왜 필요한지 이해한다.
+- Python 중급 개념을 실제 백엔드 구조와 연결한다.
+- 최종적으로 센서 데이터를 수집·검증·저장·조회하는 비동기 API 구조를 이해한다.
 
-| 일차 | 주제              |
-| -: | --------------- |
-|  1 | 객체, 참조, 가변성, 복사 |
-|  2 | 딕셔너리와 자료구조 설계   |
-|  3 | 함수 인자, 반환값, 부작용 |
-|  4 | 조건식과 상태 규칙 모델링  |
-|  5 | 반복문과 컴프리헨션      |
-|  6 | 정렬, 그룹화, 최신 상태  |
-|  7 | 모듈 분리와 리팩터링     |
+---
 
-### 2주 차 — 객체 모델링과 안정성
+## 전체 커리큘럼
 
-| 일차 | 주제             |
-| -: | -------------- |
-|  8 | 예외 처리와 입력 검증   |
-|  9 | 클래스와 인스턴스      |
-| 10 | 데이터 클래스와 객체 합성 |
-| 11 | 프로퍼티와 캡슐화      |
-| 12 | 반복자와 제너레이터     |
-| 13 | JSON 파일 저장과 복원 |
-| 14 | 테스트와 최종 리팩터링   |
+| 단계 | 폴더명 | 핵심 내용 | 주요 Python / Backend 개념 |
+|---:|---|---|---|
+| 01 | `day01_object_reference` | 객체, 참조, 가변성, 복사 | 객체와 이름, `is` / `==`, mutable / immutable, shallow/deep copy |
+| 02 | `day02_dictionary_design` | 딕셔너리와 자료구조 설계 | `dict`, 중첩 자료구조, 키 조회, 자료구조 선택 |
+| 03 | `day03_function_design` | 함수 설계와 부작용 | 인자, 반환값, 기본 인자, 부작용, 타입 힌트 |
+| 04 | `unit04_class_instance` | 클래스와 인스턴스 | `class`, `self`, `__init__`, 인스턴스/클래스 속성 |
+| 05 | `unit05_iteration_comprehension` | 반복 처리와 컴프리헨션 | `for`, comprehension, `any()`, `all()`, `enumerate()` |
+| 06 | `unit06_sort_group_latest` | 정렬, 그룹화, 최신 상태 | `sorted()`, `key`, `lambda`, `min/max`, 그룹화 |
+| 07 | `unit07_module_refactoring` | 모듈 분리와 리팩터링 | `import`, 모듈 경계, 실행 진입점, 책임 분리 |
+| 08 | `unit08_exception_contract` | 예외 처리와 실패 계약 | `try/except`, `raise`, 사용자 정의 예외, 예외 전파 |
+| 09 | `unit09_dataclass_composition` | 데이터 클래스와 객체 합성 | `dataclass`, `field`, `default_factory`, composition |
+| 10 | `unit10_property_encapsulation` | 프로퍼티와 캡슐화 | `@property`, 내부 상태, 방어적 복사, 캡슐화 |
+| 11 | `unit11_iterator_generator` | 반복자와 제너레이터 | iterable, iterator, `iter()`, `next()`, `yield` |
+| 12 | `unit12_api_serialization` | 파일·JSON·직렬화 | `json`, `pathlib`, `with`, serialization |
+| 13 | `unit13_function_objects` | 함수 객체와 고차 함수 | 함수도 객체, 함수를 인자로 전달, 함수를 반환, 함수 매핑 |
+| 14 | `unit14_decorator` | 데코레이터 | wrapper, decorator, `functools.wraps`, 공통 로직 분리 |
+| 15 | `unit15_fastapi_basics` | FastAPI 기초 | HTTP 요청/응답, route, GET/POST, path parameter, Pydantic |
+| 16 | `unit16_sensor_stream_collections` | 센서 스트림과 `collections` | generator 심화, `deque`, `defaultdict`, `Counter` |
+| 17 | `unit17_typing_protocol` | 타입 힌트와 인터페이스 | `Optional`, type alias, `Protocol`, 구조적 타이핑 |
+| 18 | `unit18_database_crud` | DB 기초와 CRUD | DB 연결, 모델/테이블, insert/select/update/delete, Repository 연결 |
+| 19 | `unit19_pytest_mock` | 테스트 심화 | fixture, 예외 테스트, mock, patch, 외부 의존성 격리 |
+| 20 | `unit20_async_await` | async/await 기초 | coroutine, `async`, `await`, event loop, 비동기 I/O |
+| 21 | `unit21_async_sensor_pipeline` | 비동기 센서 파이프라인 통합 | `asyncio.gather()`, 동시 센서 수집, DB 저장, FastAPI 조회 |
 
-## 전체 폴더 구성
+---
 
-python_intermediate_14days/daily
-├── day01_object_reference/
-├── day02_dictionary_design/
-├── day03_function_design/
-├── day04_rule_modeling/
-├── day05_iteration_comprehension/
-├── day06_sort_group_latest/
-├── day07_week1_refactoring/
-├── day08_exception_validation/
-├── day09_class_instance/
-├── day10_dataclass_composition/
-├── day11_property_encapsulation/
-├── day12_iterator_generator/
-├── day13_json_storage/
-└── day14_testing_final_refactor/
+## lesson note template
 
-## 세부 학습 내용 
-| 단원 | 폴더 제목                            | 핵심 주제                                 | 실용 예제에서 하는 일                                             | 주요 결과물                                                        |
-| -: | -------------------------------- | ------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------- |
-|  1 | `unit01_object_reference`        | 객체, 참조, 가변성, 복사                       | 장비 상태를 생성·복제하고 측정값 추가 시 원본 변경 여부 비교                      | `create_device()`, `add_measurement()`, `clone_device()`      |
-|  2 | `unit02_dictionary_design`       | 딕셔너리와 자료구조 설계                         | 여러 장비와 센서를 ID 기반 등록부로 관리                                 | `register_device()`, `register_sensor()`, `find_device()`     |
-|  3 | `unit03_function_design`         | 함수 인자, 반환값, 부작용, 타입 힌트                | 검증·상태 판정·장비 변경을 역할별 함수로 분리                               | `validate_value()`, `classify_status()`, `update_device()`    |
-|  4 | `unit04_class_instance`          | 클래스, 인스턴스, 속성, 메서드                    | 딕셔너리 센서를 `Sensor` 객체로 전환하고 상태와 동작을 묶음                    | `Sensor` 클래스                                                  |
-|  5 | `unit05_iteration_comprehension` | 반복문, 컴프리헨션, `any()`, `all()`          | 여러 `Sensor` 객체에 측정값을 처리하고 이상 센서를 추출                      | `process_measurements()`, `find_abnormal_sensors()`           |
-|  6 | `unit06_sort_group_latest`       | 정렬, `key`, `lambda`, 그룹화              | 측정 이력을 센서별로 묶고 최신 상태를 계산                                 | `group_measurements_by_sensor()`, `find_latest_measurement()` |
-|  7 | `unit07_module_refactoring`      | 모듈 경계, import, 실행 진입점                 | 함수와 클래스를 역할별 파일로 분리하고 의존성을 정리                            | `models.py`, `services.py`, `rules.py`, `main.py`             |
-|  8 | `unit08_exception_contract`      | 예외 처리, 실패 계약, 사용자 정의 예외               | 없는 장비·센서와 잘못된 측정값을 명시적으로 처리                              | `DeviceNotFoundError`, `InvalidMeasurementError`              |
-|  9 | `unit09_dataclass_composition`   | `dataclass`, `default_factory`, 객체 합성 | `Measurement` 값을 객체로 만들고 `Device`가 여러 `Sensor`를 포함하도록 설계 | `Measurement`, `Device`                                       |
-| 10 | `unit10_property_encapsulation`  | 프로퍼티, 캡슐화, 방어적 복사                     | 외부에서 측정 이력을 직접 훼손하지 못하도록 인터페이스 개선                        | `latest_value`, `measurements`, `calculate_overall_status()`  |
-| 11 | `unit11_iterator_generator`      | iterable, iterator, generator         | 많은 측정값을 목록으로 한꺼번에 만들지 않고 순차 처리                           | `read_measurements()`, `filter_abnormal()`                    |
-| 12 | `unit12_json_storage`            | 파일, JSON, `pathlib`, `with`, 직렬화      | 장비와 센서 상태를 파일에 저장하고 객체로 복원                               | `save_devices()`, `load_devices()`                            |
-| 13 | `unit13_testing_final_refactor`  | `pytest`, 경계값, 예외 테스트, 최종 구조          | 전체 기능을 테스트하고 패키지 구조를 최종 정리                               | `tests/`, 최종 `device_twin` 패키지                                |
-
-
-## daily lesson note template
-# Day 0
+# Unit
 
 ## 오늘의 목표
 
@@ -89,5 +62,3 @@ python_intermediate_14days/daily
 - 
 
 ## 오늘의 결론
-
-
